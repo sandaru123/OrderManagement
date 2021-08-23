@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.DAL;
 using OrderManagement.Interface;
+using OrderManagement.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,27 +25,20 @@ namespace OrderManagement.Repository
         /// get all customer names 
         /// </summary>
         /// <returns></returns>
-        public async Task<List<string>> GetAllCustomersAsync()
+        public async Task<List<CustomerModel>> GetAllCustomersAsync()
         {
             try
             {
-                List<string> customers_ = new List<string>();
+                List<CustomerModel> customers_ = new List<CustomerModel>();
 
                 var cust = await ordersDBContext.Customer.ToListAsync();
-                if (cust.Count != 0)
-                {
-                    foreach (var c in cust)
-                    {
-                        customers_.Add(c.CustomerName);
-                    }
-                }
-                
+              
+                customers_ = mapper.Map<List<CustomerModel>>(cust);
 
                 return customers_;
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
             

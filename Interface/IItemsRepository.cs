@@ -1,4 +1,5 @@
 ﻿using OrderManagement.DAL;
+using OrderManagement.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace OrderManagement.Interface
 {
     public interface IItemsRepository
     {
-        Task<List<string>> GetAllItemsAsync();
+        Task<List<ItemModel>> GetAllItemsAsync();
 
         Task<Item> GetItemDetailsAsync(int itemId);
     }

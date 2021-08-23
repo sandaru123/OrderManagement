@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.DAL;
 using OrderManagement.Interface;
@@ -11,6 +12,7 @@ using OrderManagement.Model;
 
 namespace OrderManagement.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : ControllerBase
@@ -61,11 +63,38 @@ namespace OrderManagement.Controllers
 
         [Route("~/api/EditOrderDetailsAsync")]
         [HttpPut]
-        public async Task EditOrderDetailsAsync(OrderModel orderModel)
+        public async Task<ActionResult> EditOrderDetailsAsync(OrderVM orderModel)
         {
-            var bl = await orderRepository.SaveOrderDetailsAsync(orderModel);
+           var result=  await orderRepository.EditOrderDetailsAsync(orderModel);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+           
         }
 
+
+        [Route("~/api/DeleteOrderAsync")]
+        [HttpDelete]
+        public async Task<ActionResult> DeleteOrderAsync(int id)
+        {
+            var result = await orderRepository.DeleteOrderAsync(id);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
 
     }
 }

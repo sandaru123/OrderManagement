@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.DAL;
 using OrderManagement.Interface;
+using OrderManagement.Model;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace OrderManagement.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
@@ -26,7 +29,7 @@ namespace OrderManagement.Controllers
         // GET: api/<ItemsController>
         [Route("~/api/GetAllItemsCodesAsync")]
         [HttpGet]
-        public async Task<ActionResult<List<string>>> GetAllItemsCodesAsync()
+        public async Task<ActionResult<List<ItemModel>>> GetAllItemsCodesAsync()
         {
             var itms = await itemsRepository.GetAllItemsAsync();
 

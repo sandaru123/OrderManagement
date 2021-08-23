@@ -14,5 +14,10 @@ namespace OrderManagement.Interface
         Task<List<OrderModel>> GetAllOrdersAsync();
 
         Task<OrderModel> GetOderDetailsbyIdAsync(int orderId);
+        Task<bool> EditOrderDetailsAsync(OrderVM orderVm);
+
+        Task<bool> DeleteOrderAsync(int id);
+
+
     }
 }

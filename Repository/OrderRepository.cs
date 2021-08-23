@@ -144,6 +144,12 @@ namespace OrderManagement.Repository
         }
 
 
+
+        /// <summary>
+        /// Edit order details
+        /// </summary>
+        /// <param name="orderVm"></param>
+        /// <returns></returns>
         public async Task<bool> EditOrderDetailsAsync(OrderVM orderVm)
         {
             try
@@ -155,18 +161,56 @@ namespace OrderManagement.Repository
                 //get order
                 var orderObj = await ordersDBContext.Order.FirstOrDefaultAsync(x=>x.OrderId == orderVm.OrderId);
 
+
                 if (orderObj!= null)
                 {
+
+
+                    //object items less than db object
+                    //get all he order items according to the orderid
+                    var io_obj_list = await ordersDBContext.ItemOrder.Where(a => a.OrderId == orderVm.OrderId).ToListAsync();
+
+                    List<int> inDb_and_obj = new List<int>();
+                    List<int> inDb = new List<int>();
+
+
+                    foreach (var ind in io_obj_list)
+                    {
+                        inDb.Add(ind.ItemId);
+                    }
+
+                    foreach (var io_objs in io_obj_list)
+                    {
+                        foreach (var itm_odrs in orderVm.ItemOrders)
+                        {
+                            if (itm_odrs.ItemId == io_objs.ItemId)
+                            {
+                                inDb_and_obj.Add(itm_odrs.ItemId);
+                            }
+                        }  
+                    }
+
+                    var not_inDb_list = inDb.Except(inDb_and_obj).ToList();
+
+                    if (not_inDb_list.Count != 0)
+                    {
+                        foreach (var itms in not_inDb_list)
+                        {
+                            var dltobj = await ordersDBContext.ItemOrder.FirstOrDefaultAsync(a=>a.ItemId == itms && a.OrderId == orderVm.OrderId);
+                            ordersDBContext.ItemOrder.Remove(dltobj);
+                            await ordersDBContext.SaveChangesAsync();
+                        }
+                    }
                     //edit items_order
                     foreach (var obj in orderVm.ItemOrders)
                     {
-                        var io_obj = await ordersDBContext.ItemOrder.FirstOrDefaultAsync(a=>a.ItemOrderId == obj.ItemOrderId);
 
-                        if (io_obj!= null)
+                        var io_obj = await ordersDBContext.ItemOrder.FirstOrDefaultAsync(a=>a.OrderId == obj.OrderId && a.ItemId == obj.ItemId);
+
+
+                        if (io_obj!= null && io_obj.ItemId == obj.ItemId)
                         {
-                            //calculate tax and total if quantity is different
-                            if (io_obj.Quantity != obj.Quantity)
-                            {
+                           
                                 var item = await ordersDBContext.Item.FirstOrDefaultAsync(v => v.ItemId == obj.ItemId);
                                 io_obj.ExclAmount = obj.Quantity * item.Price;
                                 io_obj.TaxAmount = io_obj.ExclAmount * item.Tax / 100;
@@ -184,30 +228,77 @@ namespace OrderManagement.Repository
                                 tot_excl += io_obj.ExclAmount;
                                 tot_tax += io_obj.TaxAmount;
                                 tot_inc += io_obj.InclAmount;
-                            }
-                            else
-                            {
-                                io_obj = mapper.Map<ItemOrder>(obj);
-                                await ordersDBContext.SaveChangesAsync();
+                            
+                        }
+                        else
+                        {
+                            //if another item add to the edit
+                            // obj - itemorders
+                            ItemOrder itemOrder = mapper.Map<ItemOrder>(obj);
+                            var item = await ordersDBContext.Item.FirstOrDefaultAsync(v => v.ItemId == obj.ItemId);
+                            itemOrder.ExclAmount = obj.Quantity * item.Price;
+                            itemOrder.TaxAmount = itemOrder.ExclAmount * item.Tax / 100;
+                            itemOrder.InclAmount = itemOrder.ExclAmount + itemOrder.TaxAmount;
 
-                                tot_excl += obj.ExclAmount;
-                                tot_tax += obj.TaxAmount;
-                                tot_inc += obj.InclAmount;
-                            }
+                            await ordersDBContext.ItemOrder.AddAsync(itemOrder);
+                            await ordersDBContext.SaveChangesAsync();
+                            tot_excl += itemOrder.ExclAmount;
+                            tot_tax += itemOrder.TaxAmount;
+                            tot_inc += itemOrder.InclAmount;
                         }
 
                     }
 
+                    Order orderObj2 = await ordersDBContext.Order.FirstOrDefaultAsync(x => x.OrderId == orderVm.OrderId);
+                  
+                    orderObj2.InvNo = orderVm.InvNo;
+                    orderObj2.InvDate = orderVm.InvDate;
+                    orderObj2.ReferNo = orderVm.ReferNo;
+                    orderObj2.Note = orderVm.Note;
 
-
-
-                    orderObj = mapper.Map<Order>(orderVm);
-                    orderObj.TotExcl = tot_excl;
-                    orderObj.TotIncl = tot_inc;
-                    orderObj.TotTax = tot_tax;
+                    orderObj2.TotExcl = tot_excl;
+                    orderObj2.TotIncl = tot_inc;
+                    orderObj2.TotTax = tot_tax;
                     await ordersDBContext.SaveChangesAsync();
                 }
                 return true;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// delete order details
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteOrderAsync(int id)
+        {
+            try
+            {
+                var orderObj = await ordersDBContext.Order.FirstOrDefaultAsync(c=>c.OrderId == id);
+
+                if (orderObj!= null)
+                {
+                    ordersDBContext.Order.Remove(orderObj);
+                    await ordersDBContext.SaveChangesAsync();
+
+                    var itemOrdersList = await ordersDBContext.ItemOrder.Where(a=>a.OrderId == id).ToListAsync();
+
+                    if (itemOrdersList.Count != 0)
+                    {
+                        foreach (var itm in itemOrdersList)
+                        {
+                            ordersDBContext.ItemOrder.Remove(itm);
+                            await ordersDBContext.SaveChangesAsync();
+                        }
+                        return true;
+                    }
+                }
+                return false;
             }
             catch (Exception e)
             {

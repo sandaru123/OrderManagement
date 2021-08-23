@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using OrderManagement.DAL;
 using OrderManagement.Interface;
+using OrderManagement.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,33 +13,27 @@ namespace OrderManagement.Repository
     public class ItemsRepository: IItemsRepository
     {
         private readonly OrdersDBContext ordersDBContext;
+        private readonly IMapper mapper;
 
-        public ItemsRepository(OrdersDBContext _ordersDBContext)
+        public ItemsRepository(OrdersDBContext _ordersDBContext, IMapper _mapper)
         {
             ordersDBContext = _ordersDBContext;
+            mapper = _mapper;
         }
 
         /// <summary>
         /// get all itemcodes 
         /// </summary>
         /// <returns></returns>
-        public async Task<List<string>> GetAllItemsAsync()
+        public async Task<List<ItemModel>> GetAllItemsAsync()
         {
             try
             {
                 var items =await ordersDBContext.Item.ToListAsync();
 
-                List<string> itemsStr = new List<string>();
+                List<ItemModel> itemsStr = new List<ItemModel>();
 
-                if (items.Count != 0 )
-                {
-                    foreach (var item in items)
-                    {
-                        itemsStr.Add(item.ItemCode);
-                    }
-
-                    return itemsStr;
-                }
+                itemsStr = mapper.Map<List<ItemModel>>(items);
                 return itemsStr;
             }
             catch (Exception ex)
