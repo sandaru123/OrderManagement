@@ -25,16 +25,14 @@ namespace OrderManagement.Repository
         /// get all itemcodes 
         /// </summary>
         /// <returns></returns>
-        public async Task<List<ItemModel>> GetAllItemsAsync()
+        public async Task<List<Item>> GetAllItemsAsync()
         {
             try
             {
                 var items =await ordersDBContext.Item.ToListAsync();
 
-                List<ItemModel> itemsStr = new List<ItemModel>();
-
-                itemsStr = mapper.Map<List<ItemModel>>(items);
-                return itemsStr;
+               
+                return items;
             }
             catch (Exception ex)
             {

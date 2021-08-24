@@ -9,7 +9,7 @@ namespace OrderManagement.Interface
 {
     public interface IItemsRepository
     {
-        Task<List<ItemModel>> GetAllItemsAsync();
+        Task<List<Item>> GetAllItemsAsync();
 
         Task<Item> GetItemDetailsAsync(int itemId);
     }

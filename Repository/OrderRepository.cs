@@ -32,7 +32,17 @@ namespace OrderManagement.Repository
             {
                 if (orderModel!= null)
                 {
-                    Order order =  mapper.Map<Order>(orderModel);
+                    Order order = new Order();
+
+                    order.CustomerId = orderModel.CustomerId;
+                    order.InvNo = orderModel.InvNo;
+                    order.InvDate = orderModel.InvDate;
+                    order.InvDate = orderModel.InvDate;
+                    order.Note = orderModel.Note;
+                    order.ReferNo = orderModel.ReferNo;
+                    order.TotExcl = 0;
+                    order.TotIncl = 0;
+                    order.TotTax = 0;
 
                     await ordersDBContext.Order.AddAsync(order);
                     await ordersDBContext.SaveChangesAsync();

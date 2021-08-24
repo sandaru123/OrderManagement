@@ -29,7 +29,7 @@ namespace OrderManagement.Controllers
         // GET: api/<ItemsController>
         [Route("~/api/GetAllItemsCodesAsync")]
         [HttpGet]
-        public async Task<ActionResult<List<ItemModel>>> GetAllItemsCodesAsync()
+        public async Task<ActionResult<List<Item>>> GetAllItemsCodesAsync()
         {
             var itms = await itemsRepository.GetAllItemsAsync();
 

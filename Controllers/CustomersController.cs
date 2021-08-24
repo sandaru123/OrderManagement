@@ -12,7 +12,7 @@ using OrderManagement.Model;
 
 namespace OrderManagement.Controllers
 {
-    
+    [Authorize]
     [Produces("application/json")]
     [Route("api/Customers")]
     [ApiController]
