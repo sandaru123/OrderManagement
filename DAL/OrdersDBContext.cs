@@ -24,7 +24,7 @@ namespace OrderManagement.DAL
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=DESKTOP-K4NQ2IO;Initial Catalog=OrdersDB;Integrated Security=True;Trusted_Connection=True;");
+             //   optionsBuilder.UseSqlServer("Server=DESKTOP-K4NQ2IO;Initial Catalog=OrdersDB;Integrated Security=True;Trusted_Connection=True;");
             }
         }
 

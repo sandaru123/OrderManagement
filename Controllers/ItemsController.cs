@@ -33,7 +33,12 @@ namespace OrderManagement.Controllers
         {
             var itms = await itemsRepository.GetAllItemsAsync();
 
-            return itms;
+            if (itms.Count!= 0)
+            {
+                return Ok(new { itms, Message = "Success" });
+            }
+
+            return BadRequest(new { itms, Message = "Unsuccessfull" });
         }
 
         // GET: api/<ItemsController>
@@ -43,7 +48,12 @@ namespace OrderManagement.Controllers
         {
             var itms = await itemsRepository.GetItemDetailsAsync(itemId);
 
-            return itms;
+            if (itms != null)
+            {
+                return Ok(new { itms, Message = "Success" });
+            }
+
+            return BadRequest(new { itms, Message = "Unsuccessfull" });
         }
 
 

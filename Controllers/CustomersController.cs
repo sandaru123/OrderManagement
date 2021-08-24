@@ -35,10 +35,10 @@ namespace OrderManagement.Controllers
 
             if (customers.Count != 0)
             {
-                return customers;
+                return Ok(new { customers, Message = "Success" });
             }
 
-            return null;
+            return BadRequest(new { customers, Message = "Unsuccessfull" });
         }
 
 
@@ -48,7 +48,12 @@ namespace OrderManagement.Controllers
         {
             var customers = await customersRepository.GetCustomerByIdAsync(id);
 
-            return customers;
+            if (customers != null)
+            {
+                return Ok(new { customers, Message = "Success" });
+            }
+
+            return BadRequest(new { customers, Message = "Unsuccessfull" });
 
         }
 

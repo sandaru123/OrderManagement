@@ -28,9 +28,16 @@ namespace OrderManagement.Controllers
         // POST api/<OrdersController>
         [Route("~/api/SaveOrderDetailsAsync")]
         [HttpPost]
-        public async Task SaveOrderDetailsAsync(OrderModel orderModel)
+        public async Task<ActionResult<bool>> SaveOrderDetailsAsync(OrderModel orderModel)
         {
             var bl = await orderRepository.SaveOrderDetailsAsync(orderModel);
+
+            if (bl)
+            {
+                return Ok(new { bl, Message = "Success" });
+            }
+
+            return BadRequest(new {bl, Message = "Unsuccessfull" });
         }
 
         [Route("~/api/GetAllOrdersAsync")]
@@ -41,10 +48,10 @@ namespace OrderManagement.Controllers
 
             if (orders.Count != 0)
             {
-                return orders;
+                return Ok(new { orders, Message = "Success" });
             }
 
-            return null;
+            return BadRequest(new { Message = "Unsuccessfull" });
         }
 
         [Route("~/api/GetOrderDetailsByIdAsync")]
@@ -55,25 +62,26 @@ namespace OrderManagement.Controllers
 
             if (order != null)
             {
-                return order;
+                //return order;
+                return Ok(new { order, Message="Success" });
             }
 
-            return null;
+            return BadRequest(new { Message = "Null" });
         }
 
         [Route("~/api/EditOrderDetailsAsync")]
         [HttpPut]
-        public async Task<ActionResult> EditOrderDetailsAsync(OrderVM orderModel)
+        public async Task<ActionResult<bool>> EditOrderDetailsAsync(OrderVM orderModel)
         {
            var result=  await orderRepository.EditOrderDetailsAsync(orderModel);
 
             if (result)
             {
-                return Ok();
+                return Ok(new { result, Message = "Success" }); ;
             }
             else
             {
-                return BadRequest();
+                return BadRequest(new { result, Message = "Unsuccessfull" });
             }
            
         }
@@ -81,17 +89,17 @@ namespace OrderManagement.Controllers
 
         [Route("~/api/DeleteOrderAsync")]
         [HttpDelete]
-        public async Task<ActionResult> DeleteOrderAsync(int id)
+        public async Task<ActionResult<bool>> DeleteOrderAsync(int id)
         {
             var result = await orderRepository.DeleteOrderAsync(id);
 
             if (result)
             {
-                return Ok();
+                return Ok(new {result , Message = "Successfull" });
             }
             else
             {
-                return BadRequest();
+                return BadRequest(new{result, Message = "Null"});
             }
 
         }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,7 +40,10 @@ namespace OrderManagement
         {
             services.AddControllers();
 
-            services.AddDbContext<OrdersDBContext>();
+            string conStr = this.Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<OrdersDBContext>(options => options.UseSqlServer(conStr));
+
+            //services.AddDbContext<OrdersDBContext>();
 
             // Auto Mapper Configurations
             var mapperConfig = new MapperConfiguration(mc =>
@@ -49,6 +53,8 @@ namespace OrderManagement
 
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
+
+            
 
             //interfaces DI
             services.AddScoped<ICustomersRepository, CustomersRepository>();

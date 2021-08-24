@@ -80,7 +80,7 @@ namespace OrderManagement.Repository
             catch (Exception e)
             {
 
-                throw e;
+                throw new Exception(string.Format(e.Message));
             }
 
           
@@ -112,7 +112,7 @@ namespace OrderManagement.Repository
             catch (Exception e)
             {
 
-                throw e;
+                throw new Exception(string.Format(e.Message));
             }
         }
 
@@ -126,20 +126,20 @@ namespace OrderManagement.Repository
             try
             {
                 OrderModel orderModel = new OrderModel();
-                var order = await ordersDBContext.Order.FirstOrDefaultAsync(a=>a.OrderId == orderId);
+                var order = await ordersDBContext.Order.Include(a=>a.ItemOrder).FirstOrDefaultAsync(a=>a.OrderId == orderId);
                 if (order!= null)
                 {
                     orderModel = mapper.Map<OrderModel>(order);
                     List<ItemOrderModel> itemOrderModel = mapper.Map<List<ItemOrderModel>>(order.ItemOrder);
 
                     orderModel.ItemOrders = itemOrderModel;
+                    return orderModel;
                 }
-                return orderModel;
+                return null;
             }
             catch (Exception e)
             {
-
-                throw e;
+                throw new Exception(string.Format(e.Message));
             }
         }
 
@@ -265,8 +265,7 @@ namespace OrderManagement.Repository
             }
             catch (Exception e)
             {
-
-                throw e;
+                throw new Exception(string.Format(e.Message));
             }
         }
 
@@ -279,31 +278,31 @@ namespace OrderManagement.Repository
         {
             try
             {
+                var itemOrdersList = await ordersDBContext.ItemOrder.Where(a => a.OrderId == id).ToListAsync();
+
+                if (itemOrdersList.Count != 0)
+                {
+                    foreach (var itm in itemOrdersList)
+                    {
+                        ordersDBContext.ItemOrder.Remove(itm);
+                        await ordersDBContext.SaveChangesAsync();
+                    }
+                }
+
+
                 var orderObj = await ordersDBContext.Order.FirstOrDefaultAsync(c=>c.OrderId == id);
 
                 if (orderObj!= null)
                 {
                     ordersDBContext.Order.Remove(orderObj);
                     await ordersDBContext.SaveChangesAsync();
-
-                    var itemOrdersList = await ordersDBContext.ItemOrder.Where(a=>a.OrderId == id).ToListAsync();
-
-                    if (itemOrdersList.Count != 0)
-                    {
-                        foreach (var itm in itemOrdersList)
-                        {
-                            ordersDBContext.ItemOrder.Remove(itm);
-                            await ordersDBContext.SaveChangesAsync();
-                        }
-                        return true;
-                    }
+                    return true;
                 }
                 return false;
             }
             catch (Exception e)
             {
-
-                throw e;
+                throw new Exception(string.Format(e.Message));
             }
         }
     }

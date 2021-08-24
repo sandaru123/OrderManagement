@@ -38,8 +38,7 @@ namespace OrderManagement.Repository
             }
             catch (Exception ex)
             {
-
-                throw ex;
+                throw new Exception(string.Format(ex.Message));
             }
             
         }
@@ -59,8 +58,7 @@ namespace OrderManagement.Repository
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw new Exception(string.Format(ex.Message));
             }
         }
 
